@@ -71,6 +71,11 @@ case "$host" in
         MATHLIB=""
         SYS_GL_LIBS=""
         ;;
+    *-*-riscos* )
+        EXE=",e1f"
+        MATHLIB=""
+        SYS_GL_LIBS=""
+        ;;
     *)
         dnl Oh well, call it Unix...
         ISUNIX="true"
@@ -120,6 +125,9 @@ AC_MSG_CHECKING(for OpenGL support)
 have_opengl=no
 AC_TRY_COMPILE([
  #include "SDL_opengl.h"
+ #ifndef SDL_VIDEO_OPENGL
+ #error SDL_VIDEO_OPENGL
+ #endif
 ],[
 ],[
 have_opengl=yes
@@ -130,11 +138,10 @@ dnl Check for OpenGL ES
 AC_MSG_CHECKING(for OpenGL ES support)
 have_opengles=no
 AC_TRY_COMPILE([
- #if defined (__IPHONEOS__)
-    #include <OpenGLES/ES1/gl.h>
- #else
-    #include <GLES/gl.h>
- #endif /* __QNXNTO__ */
+ #include "SDL_opengles.h"
+ #ifndef SDL_VIDEO_OPENGL_ES
+ #error SDL_VIDEO_OPENGL_ES
+ #endif
 ],[
 ],[
 have_opengles=yes
@@ -145,12 +152,9 @@ dnl Check for OpenGL ES2
 AC_MSG_CHECKING(for OpenGL ES2 support)
 have_opengles2=no
 AC_TRY_COMPILE([
- #if defined (__IPHONEOS__)
-    #include <OpenGLES/ES2/gl.h>
-    #include <OpenGLES/ES2/glext.h>
- #else
-    #include <GLES2/gl2.h>
-    #include <GLES2/gl2ext.h>
+ #include "SDL_opengles2.h"
+ #ifndef SDL_VIDEO_OPENGL_ES2
+ #error SDL_VIDEO_OPENGL_ES2
  #endif
 ],[
 ],[
@@ -161,19 +165,28 @@ AC_MSG_RESULT($have_opengles2)
 GLLIB=""
 GLESLIB=""
 GLES2LIB=""
+OPENGLES1_TARGETS="UNUSED"
+OPENGLES2_TARGETS="UNUSED"
+OPENGL_TARGETS="UNUSED"
 if test x$have_opengles = xyes; then
     CFLAGS="$CFLAGS -DHAVE_OPENGLES"
     GLESLIB="$XPATH -lGLESv1_CM"
+    OPENGLES1_TARGETS="TARGETS"
 fi
 if test x$have_opengles2 = xyes; then
     CFLAGS="$CFLAGS -DHAVE_OPENGLES2"
     #GLES2LIB="$XPATH -lGLESv2"
+    OPENGLES2_TARGETS="TARGETS"
 fi
 if test x$have_opengl = xyes; then
     CFLAGS="$CFLAGS -DHAVE_OPENGL"
     GLLIB="$XPATH $SYS_GL_LIBS"
+    OPENGL_TARGETS="TARGETS"
 fi
 
+AC_SUBST(OPENGLES1_TARGETS)
+AC_SUBST(OPENGLES2_TARGETS)
+AC_SUBST(OPENGL_TARGETS)
 AC_SUBST(GLLIB)
 AC_SUBST(GLESLIB)
 AC_SUBST(GLES2LIB)

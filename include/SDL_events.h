@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -85,6 +85,8 @@ typedef enum
                                      Called on Android in onResume()
                                 */
 
+    SDL_LOCALECHANGED,  /**< The user's locale preferences have changed. */
+
     /* Display events */
     SDL_DISPLAYEVENT   = 0x150,  /**< Display state change */
 
@@ -123,6 +125,9 @@ typedef enum
     SDL_CONTROLLERDEVICEADDED,         /**< A new Game controller has been inserted into the system */
     SDL_CONTROLLERDEVICEREMOVED,       /**< An opened Game controller has been removed */
     SDL_CONTROLLERDEVICEREMAPPED,      /**< The controller mapping was updated */
+    SDL_CONTROLLERTOUCHPADDOWN,        /**< Game controller touchpad was touched */
+    SDL_CONTROLLERTOUCHPADMOTION,      /**< Game controller touchpad finger was moved */
+    SDL_CONTROLLERTOUCHPADUP,          /**< Game controller touchpad finger was lifted */
 
     /* Touch events */
     SDL_FINGERDOWN      = 0x700,
@@ -414,6 +419,22 @@ typedef struct SDL_ControllerDeviceEvent
 } SDL_ControllerDeviceEvent;
 
 /**
+ *  \brief Game controller touchpad event structure (event.ctouchpad.*)
+ */
+typedef struct SDL_ControllerTouchpadEvent
+{
+    Uint32 type;        /**< ::SDL_CONTROLLERTOUCHPADDOWN or ::SDL_CONTROLLERTOUCHPADMOTION or ::SDL_CONTROLLERTOUCHPADUP */
+    Uint32 timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
+    SDL_JoystickID which; /**< The joystick instance id */
+    int touchpad;       /**< The index of the touchpad */
+    int finger;         /**< The index of the finger on the touchpad */
+    float x;            /**< Normalized in the range 0...1 with 0 being on the left */
+    float y;            /**< Normalized in the range 0...1 with 0 being at the top */
+    float pressure;     /**< Normalized in the range 0...1 */
+} SDL_ControllerTouchpadEvent;
+
+
+/**
  *  \brief Audio device event structure (event.adevice.*)
  */
 typedef struct SDL_AudioDeviceEvent
@@ -442,6 +463,7 @@ typedef struct SDL_TouchFingerEvent
     float dx;           /**< Normalized in the range -1...1 */
     float dy;           /**< Normalized in the range -1...1 */
     float pressure;     /**< Normalized in the range 0...1 */
+    Uint32 windowID;    /**< The window underneath the finger, if any */
 } SDL_TouchFingerEvent;
 
 
@@ -556,33 +578,34 @@ typedef struct SDL_SysWMEvent
  */
 typedef union SDL_Event
 {
-    Uint32 type;                    /**< Event type, shared with all events */
-    SDL_CommonEvent common;         /**< Common event data */
-    SDL_DisplayEvent display;       /**< Window event data */
-    SDL_WindowEvent window;         /**< Window event data */
-    SDL_KeyboardEvent key;          /**< Keyboard event data */
-    SDL_TextEditingEvent edit;      /**< Text editing event data */
-    SDL_TextInputEvent text;        /**< Text input event data */
-    SDL_MouseMotionEvent motion;    /**< Mouse motion event data */
-    SDL_MouseButtonEvent button;    /**< Mouse button event data */
-    SDL_MouseWheelEvent wheel;      /**< Mouse wheel event data */
-    SDL_JoyAxisEvent jaxis;         /**< Joystick axis event data */
-    SDL_JoyBallEvent jball;         /**< Joystick ball event data */
-    SDL_JoyHatEvent jhat;           /**< Joystick hat event data */
-    SDL_JoyButtonEvent jbutton;     /**< Joystick button event data */
-    SDL_JoyDeviceEvent jdevice;     /**< Joystick device change event data */
-    SDL_ControllerAxisEvent caxis;      /**< Game Controller axis event data */
-    SDL_ControllerButtonEvent cbutton;  /**< Game Controller button event data */
-    SDL_ControllerDeviceEvent cdevice;  /**< Game Controller device event data */
-    SDL_AudioDeviceEvent adevice;   /**< Audio device event data */
-    SDL_SensorEvent sensor;         /**< Sensor event data */
-    SDL_QuitEvent quit;             /**< Quit request event data */
-    SDL_UserEvent user;             /**< Custom event data */
-    SDL_SysWMEvent syswm;           /**< System dependent window event data */
-    SDL_TouchFingerEvent tfinger;   /**< Touch finger event data */
-    SDL_MultiGestureEvent mgesture; /**< Gesture event data */
-    SDL_DollarGestureEvent dgesture; /**< Gesture event data */
-    SDL_DropEvent drop;             /**< Drag and drop event data */
+    Uint32 type;                            /**< Event type, shared with all events */
+    SDL_CommonEvent common;                 /**< Common event data */
+    SDL_DisplayEvent display;               /**< Display event data */
+    SDL_WindowEvent window;                 /**< Window event data */
+    SDL_KeyboardEvent key;                  /**< Keyboard event data */
+    SDL_TextEditingEvent edit;              /**< Text editing event data */
+    SDL_TextInputEvent text;                /**< Text input event data */
+    SDL_MouseMotionEvent motion;            /**< Mouse motion event data */
+    SDL_MouseButtonEvent button;            /**< Mouse button event data */
+    SDL_MouseWheelEvent wheel;              /**< Mouse wheel event data */
+    SDL_JoyAxisEvent jaxis;                 /**< Joystick axis event data */
+    SDL_JoyBallEvent jball;                 /**< Joystick ball event data */
+    SDL_JoyHatEvent jhat;                   /**< Joystick hat event data */
+    SDL_JoyButtonEvent jbutton;             /**< Joystick button event data */
+    SDL_JoyDeviceEvent jdevice;             /**< Joystick device change event data */
+    SDL_ControllerAxisEvent caxis;          /**< Game Controller axis event data */
+    SDL_ControllerButtonEvent cbutton;      /**< Game Controller button event data */
+    SDL_ControllerDeviceEvent cdevice;      /**< Game Controller device event data */
+    SDL_ControllerTouchpadEvent ctouchpad;  /**< Game Controller touchpad event data */
+    SDL_AudioDeviceEvent adevice;           /**< Audio device event data */
+    SDL_SensorEvent sensor;                 /**< Sensor event data */
+    SDL_QuitEvent quit;                     /**< Quit request event data */
+    SDL_UserEvent user;                     /**< Custom event data */
+    SDL_SysWMEvent syswm;                   /**< System dependent window event data */
+    SDL_TouchFingerEvent tfinger;           /**< Touch finger event data */
+    SDL_MultiGestureEvent mgesture;         /**< Gesture event data */
+    SDL_DollarGestureEvent dgesture;        /**< Gesture event data */
+    SDL_DropEvent drop;                     /**< Drag and drop event data */
 
     /* This is necessary for ABI compatibility between Visual C++ and GCC
        Visual C++ will respect the push pack pragma and use 52 bytes for
@@ -593,6 +616,9 @@ typedef union SDL_Event
     */
     Uint8 padding[56];
 } SDL_Event;
+
+/* Make sure we haven't broken binary compatibility */
+SDL_COMPILE_TIME_ASSERT(SDL_Event, sizeof(SDL_Event) == 56);
 
 
 /* Function prototypes */

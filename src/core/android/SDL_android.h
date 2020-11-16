@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -39,6 +39,8 @@ extern "C" {
 extern void Android_JNI_SetActivityTitle(const char *title);
 extern void Android_JNI_SetWindowStyle(SDL_bool fullscreen);
 extern void Android_JNI_SetOrientation(int w, int h, int resizable, const char *hint);
+extern void Android_JNI_MinizeWindow(void);
+extern SDL_bool Android_JNI_ShouldMinimizeOnFocusLoss(void);
 
 extern SDL_bool Android_JNI_GetAccelerometerValues(float values[3]);
 extern void Android_JNI_ShowTextInput(SDL_Rect *inputRect);
@@ -102,6 +104,9 @@ void Android_JNI_InitTouch(void);
 JNIEnv *Android_JNI_GetEnv(void);
 int Android_JNI_SetupThread(void);
 
+/* Locale */
+int Android_JNI_GetLocale(char *buf, size_t buflen);
+
 /* Generic messages */
 int Android_JNI_SendMessage(int command, int param);
 
@@ -121,11 +126,21 @@ SDL_bool Android_JNI_SetSystemCursor(int cursorID);
 SDL_bool Android_JNI_SupportsRelativeMouse(void);
 SDL_bool Android_JNI_SetRelativeMouseEnabled(SDL_bool enabled);
 
+/* Request permission */
+SDL_bool Android_JNI_RequestPermission(const char *permission);
+
+int Android_JNI_OpenURL(const char *url);
+
+int SDL_GetAndroidSDKVersion(void);
 
 SDL_bool SDL_IsAndroidTablet(void);
 SDL_bool SDL_IsAndroidTV(void);
 SDL_bool SDL_IsChromebook(void);
 SDL_bool SDL_IsDeXMode(void);
+
+void Android_ActivityMutex_Lock(void);
+void Android_ActivityMutex_Unlock(void);
+void Android_ActivityMutex_Lock_Running(void);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -71,6 +71,7 @@
 #define HAVE_STRCHR 1
 #define HAVE_STRRCHR    1
 #define HAVE_STRSTR 1
+#define HAVE_STRTOK_R 1
 #define HAVE_STRTOL 1
 #define HAVE_STRTOUL    1
 #define HAVE_STRTOLL    1
@@ -121,6 +122,8 @@
 #define HAVE_SQRTF  1
 #define HAVE_TAN    1
 #define HAVE_TANF   1
+#define HAVE_TRUNC  1
+#define HAVE_TRUNCF 1
 #define HAVE_SIGACTION  1
 #define HAVE_SETJMP 1
 #define HAVE_NANOSLEEP  1
@@ -136,8 +139,9 @@
 #define SDL_HAPTIC_DUMMY 1
 
 /* Enable MFi joystick support */
+#define SDL_JOYSTICK_HIDAPI 1
 #define SDL_JOYSTICK_MFI 1
-/*#define SDL_JOYSTICK_HIDAPI 1*/
+#define SDL_JOYSTICK_VIRTUAL    1
 
 #ifdef __TVOS__
 #define SDL_SENSOR_DUMMY    1
@@ -179,6 +183,10 @@
 
 #if SDL_PLATFORM_SUPPORTS_METAL
 #define SDL_VIDEO_VULKAN 1
+#endif
+
+#if SDL_PLATFORM_SUPPORTS_METAL
+#define SDL_VIDEO_METAL 1
 #endif
 
 /* Enable system power support */

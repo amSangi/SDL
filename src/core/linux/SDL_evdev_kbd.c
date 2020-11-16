@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -216,7 +216,6 @@ static void kbd_cleanup(void)
     }
     kbd_cleanup_state = NULL;
 
-    fprintf(stderr, "(SDL restoring keyboard) ");
     ioctl(kbd->console_fd, KDSKBMODE, kbd->old_kbd_mode);
 }
 
@@ -820,7 +819,7 @@ SDL_EVDEV_kbd_keycode(SDL_EVDEV_keyboard_state *kbd, unsigned int keycode, int d
     }
 }
 
-#else /* !SDL_INPUT_LINUXKD */
+#elif !defined(SDL_INPUT_FBSDKBIO) /* !SDL_INPUT_LINUXKD */
 
 SDL_EVDEV_keyboard_state *
 SDL_EVDEV_kbd_init(void)

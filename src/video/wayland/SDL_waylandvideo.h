@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,6 +48,7 @@ struct qt_windowmanager;
 
 typedef struct {
     struct wl_display *display;
+    int display_disconnected;
     struct wl_registry *registry;
     struct wl_compositor *compositor;
     struct wl_shm *shm;
@@ -81,6 +82,11 @@ typedef struct {
 
     int relative_mouse_mode;
 } SDL_VideoData;
+
+typedef struct {
+    struct wl_output *output;
+    float scale_factor;
+} SDL_WaylandOutputData;
 
 #endif /* SDL_waylandvideo_h_ */
 
